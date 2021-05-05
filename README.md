@@ -1,10 +1,13 @@
 # tekton-lab
+---
+## 1. Install pipeline operator:
+__https://docs.openshift.com/container-platform/4.7/cicd/pipelines/installing-pipelines.html__
 
-### 1. Install pipeline operator:
+```sh
+sh curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/pipelines-operator/subscription.yaml | oc apply -f -
+```
 
-- https://docs.openshift.com/container-platform/4.7/cicd/pipelines/installing-pipelines.html  
-
-### 2. Install Tekton CLI:
+## 2. Install Tekton CLI:
 
 - Download software:
 
@@ -24,13 +27,13 @@ $ tar xf tkn-linux-amd64-0.17.2.tar.gz
 $ tkn version
 ~~~
 
-### 3. Create new project in which deploy the resources used by our pipeline workflow (Nexus repository, pvc (used by Tekton Pipeline), Tekton Tasks, Pipeline, Pipelinurun):
+## 3. Create new project in which deploy the resources used by our pipeline workflow (Nexus repository, pvc (used by Tekton Pipeline), Tekton Tasks, Pipeline, Pipelinurun):
 
 ~~~sh
 $ oc new-project devops
 ~~~
 
-### 4. Deploy nexus server
+## 4. Deploy nexus server
 
 ~~~sh
 cat << EOF | oc process -f - | apply -f -
@@ -126,11 +129,10 @@ objects:
 EOF
 ~~~
 
-#### Create nexus repository - maven
-
+###Create nexus repository - maven
 - https://blog.sonatype.com/using-nexus-3-as-your-repository-part-1-maven-artifacts
 
-### 5. Create Pipeline Pesistent Volume Claim:
+## 5. Create Pipeline Pesistent Volume Claim:
 
 ~~~sh
 cat << EOF | oc apply -f -
@@ -148,148 +150,28 @@ spec:
 EOF
 ~~~
 
-### 6. Create tasks:
-
-- Task to clone repository
+## 6. Create tasks resources in the namespace:
 ~~~sh
-cat << EOF | oc apply -f -
-apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: clone-repository
-spec:
-  workspaces:
-  - name: VOLUME
-  params:
-  - name: RepositoryURL
-    type: string
-    description: Url of the git repository to clone.
-    #default: "https://gitlab.cee.redhat.com/sbr-shift-emea/ocp-pipeline-lab/spring-petclinic.git"
-    default: "https://github.com/GMH501/spring-petclinic.git"
-  steps:
-  - name: git-clone
-    image: alpine/git:latest
-    script: |
-      git clone "$(params.RepositoryURL)" $(workspaces.VOLUME.path)
-  - name: print-commit
-    image: alpine/git:latest
-    script: |
-      cd $(workspaces.VOLUME.path) && git rev-parse HEAD
-EOF
+$ oc apply -k https://github.com/gmeghnag/tekton-lab -n devops
+
+task.tekton.dev/clean-volume created
+task.tekton.dev/clone-repository created
+task.tekton.dev/maven-deploy created
+task.tekton.dev/buildah created
+task.tekton.dev/deploy-app created
 ~~~
 
-- Task that use maven to build and push the .jar artifact to nexus 
-~~~sh
-cat << EOF | oc apply -f -
-apiVersion: tekton.dev/v1alpha1
-kind: Task
-metadata:
-  name: maven-deploy
-spec:
-  workspaces:
-  - name: VOLUME
-  steps:
-    - name: maven-deploy
-      image: maven
-      script: |
-        cd  $(workspaces.VOLUME.path); mvn deploy -Dmaven.test.skip=true -s settings.xml 
-EOF
-~~~
-
-- Task that use buildah to build and push the container image to the OCP_PROJECT from which it will be possible to consume it
-~~~sh
-cat << EOF | oc apply -f -
-apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: buildah
-spec:
-  params:
-  - name: BUILD_IMAGE
-    description: Reference of the image buildah will produce.
-  - name: STORAGE_DRIVER
-    description: Set buildah storage driver
-    default: vfs
-  - name: DOCKERFILE
-    description: Path to the Dockerfile to build.
-    default: ./Dockerfile
-  - name: REGISTRY_URL
-    description: Image registry URL.
-    type: string
-  - name: OCP_PROJECT
-    description: Progetto su cui pushare l'immagine buildata.
-    type: string
-  workspaces:
-  - name: VOLUME
-  results:
-  - name: IMAGE_DIGEST
-    description: Digest of the image just built.
-  steps:
-
-  - name: build
-    image: quay.io/buildah/stable:latest
-    securityContext:
-      privileged: true
-    workingDir: $(workspaces.VOLUME.path)
-    script: |
-      buildah --storage-driver=$(params.STORAGE_DRIVER) bud \
-        --format=oci \
-        --tls-verify=false --no-cache \
-        -f $(params.DOCKERFILE) -t $(params.BUILD_IMAGE) .
-    volumeMounts:
-    - name: varlibcontainers
-      mountPath: /var/lib/containers
-
-  - name: push
-    image: quay.io/buildah/stable:latest
-    workingDir: $(workspaces.VOLUME.path)
-    script: |
-      cd $(workspaces.VOLUME.path) \
-      && ARTIFACT_VERSION=`cat version.txt` \
-      && buildah --storage-driver=$(params.STORAGE_DRIVER) push \
-        --tls-verify=false \
-        --digestfile $(workspaces.VOLUME.path)/image-digest $(params.BUILD_IMAGE) \
-        $(params.REGISTRY_URL)/$(params.OCP_PROJECT)/$(params.BUILD_IMAGE):${ARTIFACT_VERSION}
-    volumeMounts:
-    - name: varlibcontainers
-      mountPath: /var/lib/containers
-
-  - name: digest-to-results
-    image: quay.io/buildah/stable:latest
-    script: cat $(workspaces.VOLUME.path)/image-digest 
-
-  volumes:
-  - name: varlibcontainers
-    emptyDir: {}
-EOF
-~~~
-
-- Task that use `oc` cli to tag the previously push image as latest on the target-project:
-~~~sh
-cat << EOF | oc apply -f -
-apiVersion: tekton.dev/v1alpha1
-kind: Task
-metadata:
-  name: deploy-app
-spec:
-  workspaces:
-  - name: VOLUME
-  params:
-  - name: BUILD_IMAGE
-    type: string
-  - name: OCP_PROJECT
-    type: string
-    description: Progetto OpenShift su cui deployare l'applicazione.
-  steps:
-    - name: patch
-      image: quay.io/openshift/origin-cli:latest
-      script: |
-        cd $(workspaces.VOLUME.path) \
-        && ARTIFACT_VERSION=`cat version.txt` \
-        && oc project $(params.OCP_PROJECT) \
-        && oc tag  $(params.BUILD_IMAGE):${ARTIFACT_VERSION} $(params.BUILD_IMAGE):latest
-EOF
-~~~
+### This will create the following Task Resources: 
+ - #### task.tekton.dev/clean-volume
+   - **Task to clean the volume (pvc-pipeline-ci) used to persist data across Tasks during pipeline execution**
+ - #### task.tekton.dev/clone-repository
+   - **Task to clone the application source code repository**
+ - #### task.tekton.dev/maven-deploy
+   - **Task that use maven to build and push the .jar artifact to nexus**
+ - #### task.tekton.dev/buildah
+   - **Task that use Buildah to build and push the container image to the OCP_PROJECT from which it will be possible to consume it**
+ - #### task.tekton.dev/deploy-app
+   - **Task that use `oc` cli to tag the previously push image as latest on the target-project**
 
 ### 7. Create the pipeline
 
