@@ -1,6 +1,0 @@
-resources:
-- clean-volume.yaml
-- clone-repo.aml
-- maven-deploy.yaml
-- build-image.yaml
-- deploy-app.yaml
