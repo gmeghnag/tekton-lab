@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clone-repository
+spec:
+  workspaces:
+  - name: VOLUME
+  params:
+  - name: REPOSITORY_URL
+    type: string
+    description: Url of the git repository to clone.
+  - name: BRANCH_NAME
+    type: string
+    description: Branch di cui eseguire il clone.
+  steps:
+  - name: git-clone
+    image: alpine/git:latest
+    script: |
+      git clone -b $(params.BRANCH_NAME) "$(params.REPOSITORY_URL)" $(workspaces.VOLUME.path) && sed -i 's#admin123#admin#g' $(workspaces.VOLUME.path)/settings.xml
+  - name: print-commit
+    image: alpine/git:latest
+    script: |
+      cd $(workspaces.VOLUME.path) && git rev-parse HEAD  \
+      && hash=$(git rev-parse HEAD | cut -c1-10) \
+      && version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed 's#<version>##g' | sed 's#</version>##g' | xargs) \
+      && echo ${version}-${hash} >> version.txt \
+      && sed -i "s#<version>${version}</version>#<version>${version}-${hash}</version>#g" pom.xml
