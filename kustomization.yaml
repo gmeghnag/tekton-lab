@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
 - tasks/clean-volume.yaml
-- tasks/clone-repo.aml
+- tasks/clone-repo.yaml
 - tasks/maven-deploy.yaml
 - tasks/build-image.yaml
 - tasks/deploy-app.yaml
