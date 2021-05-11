@@ -6,16 +6,17 @@ spec:
   workspaces:
   - name: VOLUME
   params:
+  - name: ARTIFACT_VERSION
+    type: string
   - name: BUILD_IMAGE
     type: string
   - name: OCP_PROJECT
     type: string
     description: Progetto OpenShift su cui deployare l'applicazione.
   steps:
-    - name: patch
-      image: quay.io/openshift/origin-cli:latest
-      script: |
-        cd $(workspaces.VOLUME.path) \
-        && ARTIFACT_VERSION=`cat version.txt` \
-        && oc project $(params.OCP_PROJECT) \
-        && oc tag  $(params.BUILD_IMAGE):${ARTIFACT_VERSION} $(params.BUILD_IMAGE):latest
+  - name: patch
+    image: quay.io/openshift/origin-cli:latest 
+    workingDir: $(workspaces.VOLUME.path)
+    script: |
+      oc project $(params.OCP_PROJECT)
+      oc tag  $(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION) $(params.BUILD_IMAGE):latest

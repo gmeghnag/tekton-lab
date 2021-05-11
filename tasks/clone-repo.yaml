@@ -12,16 +12,29 @@ spec:
   - name: BRANCH_NAME
     type: string
     description: Branch di cui eseguire il clone.
+  results:
+  - name: ARTIFACT_VERSION
+    description: Artifact version (version in pom.xml file + git hash)
   steps:
+
   - name: git-clone
     image: alpine/git:latest
     script: |
-      git clone -b $(params.BRANCH_NAME) "$(params.REPOSITORY_URL)" $(workspaces.VOLUME.path) && sed -i 's#admin123#admin#g' $(workspaces.VOLUME.path)/settings.xml
-  - name: print-commit
+      git clone -b $(params.BRANCH_NAME) "$(params.REPOSITORY_URL)" $(workspaces.VOLUME.path)
+
+  - name: store-artifact-version
     image: alpine/git:latest
+    workingDir: $(workspaces.VOLUME.path)
     script: |
-      cd $(workspaces.VOLUME.path) && git rev-parse HEAD  \
-      && hash=$(git rev-parse HEAD | cut -c1-10) \
-      && version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed 's#<version>##g' | sed 's#</version>##g' | xargs) \
-      && echo ${version}-${hash} >> version.txt \
-      && sed -i "s#<version>${version}</version>#<version>${version}-${hash}</version>#g" pom.xml
+      # GET THE VERSION OF THE SOFTWARE FROM pom.xml FILE
+      version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed 's#<version>##g' | sed 's#</version>##g' | xargs)
+
+      # GET THE HASH FOR THE HEAD COMMIT
+      hash=$(git rev-parse HEAD | cut -c1-10)
+
+      # UPDATE THE VERSION OF THE SOFTWARE IN pom.xml WITH THE COMMIT HASH
+      sed -i "s#<version>${version}</version>#<version>${version}-${hash}</version>#g" pom.xml
+
+      #echo ${version}-${hash} >> version.txt 
+      # SAVE THE VERSION AND THE HASH IN A RESULT VARIABLE
+      echo ${version}-${hash}| tee $(results.ARTIFACT_VERSION.path)

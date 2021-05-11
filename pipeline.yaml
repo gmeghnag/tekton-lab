@@ -4,6 +4,8 @@ metadata:
   name: pipeline-ci
 spec:
   params:
+    - name: ARTIFACT_VERSION
+      type: string
     - name: REPOSITORY_URL
       type: string
     - name: REGISTRY_URL
@@ -53,6 +55,8 @@ spec:
         - name: VOLUME
           workspace: TKN_VOLUME
       params:
+      - name: ARTIFACT_VERSION
+        value: $(tasks.clone-repository.results.ARTIFACT_VERSION)
       - name: REGISTRY_URL
         value: "$(params.REGISTRY_URL)"
       - name: BUILD_IMAGE
@@ -68,6 +72,8 @@ spec:
         - name: VOLUME
           workspace: TKN_VOLUME
       params:
+      - name: ARTIFACT_VERSION
+        value: $(tasks.clone-repository.results.ARTIFACT_VERSION)
       - name: BUILD_IMAGE
         value: "$(params.BUILD_IMAGE)"
       - name: OCP_PROJECT

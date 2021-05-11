@@ -4,7 +4,7 @@
 __https://docs.openshift.com/container-platform/4.7/cicd/pipelines/installing-pipelines.html__
 
 ```sh
-sh curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/pipelines-operator/subscription.yaml | oc apply -f -
+$ curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/pipelines-operator/subscription.yaml | oc apply -f -
 ```
 
 ## 2. Install Tekton CLI:
@@ -36,7 +36,7 @@ $ oc new-project devops
 ## 4. Deploy nexus server
 
 ~~~sh
-cat << EOF | oc process -f - | apply -f -
+cat << EOF | oc process -f - | oc apply -f -
 apiVersion: v1
 kind: Template
 metadata:

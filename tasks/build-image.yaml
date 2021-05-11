@@ -3,7 +3,9 @@ kind: Task
 metadata:
   name: buildah
 spec:
-  params:
+  params:  
+  - name: ARTIFACT_VERSION
+    type: string
   - name: BUILD_IMAGE
     description: Reference of the image buildah will produce.
   - name: STORAGE_DRIVER
@@ -50,12 +52,10 @@ spec:
     image: quay.io/buildah/stable:latest
     workingDir: $(workspaces.VOLUME.path)
     script: |
-      cd $(workspaces.VOLUME.path) \
-      && ARTIFACT_VERSION=`cat version.txt` \
-      && buildah --storage-driver=$(params.STORAGE_DRIVER) push \
+      buildah --storage-driver=$(params.STORAGE_DRIVER) push \
         $(params.PUSH_EXTRA_ARGS) --tls-verify=false \
         --digestfile $(workspaces.VOLUME.path)/image-digest $(params.BUILD_IMAGE) \
-        $(params.REGISTRY_URL)/$(params.OCP_PROJECT)/$(params.BUILD_IMAGE):${ARTIFACT_VERSION}
+        $(params.REGISTRY_URL)/$(params.OCP_PROJECT)/$(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION)
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers

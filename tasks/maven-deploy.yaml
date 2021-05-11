@@ -9,4 +9,5 @@ spec:
     - name: maven-deploy
       image: maven
       script: |
-        cd  $(workspaces.VOLUME.path); mvn deploy -Dmaven.test.skip=true -s settings.xml 
+        cd  $(workspaces.VOLUME.path); sed -i 's#admin123#admin#g' $(workspaces.VOLUME.path)/settings.xml \ 
+        && mvn deploy -Dmaven.test.skip=true -s settings.xml 

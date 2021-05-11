@@ -6,7 +6,8 @@ spec:
   workspaces:
   - name: VOLUME
   steps:
-    - name: clean-volume
-      image: alpine
-      script: |
-        rm -rf $(workspaces.VOLUME.path)/*; rm -rf $(workspaces.VOLUME.path)/.[a-zA-Z_]*; pwd; ls -la $(workspaces.VOLUME.path);
+  - name: clean-volume
+    image: alpine
+    workingDir: $(workspaces.VOLUME.path)
+    script: |
+      rm -rf $(workspaces.VOLUME.path)/*; rm -rf $(workspaces.VOLUME.path)/.[a-zA-Z_]*; pwd; ls -la $(workspaces.VOLUME.path);
