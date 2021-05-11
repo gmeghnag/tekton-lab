@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  generateName: springapp-deploy-run-
+  name: springapp-deploy-run-01
   labels:
     tekton.dev/pipeline: pipeline-ci
 spec:
@@ -12,6 +12,8 @@ spec:
   pipelineRef:
     name: pipeline-ci
   params:
+    - name: "ARTIFACT_VERSION"
+      value: ""
     - name: "REPOSITORY_URL"
       value: "https://github.com/GMH501/spring-petclinic.git"
     - name: REGISTRY_URL

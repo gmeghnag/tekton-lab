@@ -257,9 +257,9 @@ EOF
 ### 7. Set permission for tasks execution
 
 ~~~sh
-oc policy add-scc-to-user privileged -z build-bot -n devops
-oc policy add-role-to-user system:image-builder system:serviceaccount:devops:pipeline -n project-target-test
-oc policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
+oc adm policy add-scc-to-user privileged -z build-bot -n devops
+oc adm policy add-role-to-user system:image-builder system:serviceaccount:devops:pipeline -n project-target-test
+oc adm policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
 ~~~
 
 

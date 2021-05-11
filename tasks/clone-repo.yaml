@@ -30,7 +30,7 @@ spec:
       version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed 's#<version>##g' | sed 's#</version>##g' | xargs)
 
       # GET THE HASH FOR THE HEAD COMMIT
-      hash=$(git rev-parse HEAD | cut -c1-10)
+      hash=$(git rev-parse HEAD | cut -c1-7)
 
       # UPDATE THE VERSION OF THE SOFTWARE IN pom.xml WITH THE COMMIT HASH
       sed -i "s#<version>${version}</version>#<version>${version}-${hash}</version>#g" pom.xml
