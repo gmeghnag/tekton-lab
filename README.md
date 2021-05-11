@@ -129,7 +129,7 @@ objects:
 EOF
 ~~~
 
-###Create nexus repository - maven
+### Create maven repository on nexus
 - https://blog.sonatype.com/using-nexus-3-as-your-repository-part-1-maven-artifacts
 
 ## 5. Create Pipeline Pesistent Volume Claim:
@@ -173,87 +173,6 @@ task.tekton.dev/deploy-app created
  - #### task.tekton.dev/deploy-app
    - **Task that use `oc` cli to tag the previously push image as latest on the target-project**
 
-### 7. Create the pipeline
-
-~~~sh
-cat << EOF | oc apply -f -
-kind: Pipeline
-apiVersion: tekton.dev/v1alpha1
-metadata:
-  name: pipeline-ci
-spec:
-  params:
-    - name: REPOSITORY_URL
-      type: string
-    - name: REGISTRY_URL
-      type: string
-    - name: BUILD_IMAGE
-      type: string
-    - name: OCP_PROJECT
-      type: string
-    - name: BRANCH_NAME
-      type: string
-  workspaces:
-    - name: TKN_VOLUME
-  tasks:
-    - name: clean-volume
-      taskRef:
-        name: clean-volume
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
-    - name: clone-repository
-      runAfter:
-        - clean-volume
-      params:
-        - name: REPOSITORY_URL
-          value: "$(params.REPOSITORY_URL)"
-        - name: BRANCH_NAME
-          value: "$(params.BRANCH_NAME)"
-      taskRef:
-        name: clone-repository
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
-    - name: maven-deploy
-      runAfter:
-        - clone-repository
-      taskRef:
-        name: maven-deploy
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
-    - name: build-image
-      runAfter:
-      - maven-deploy
-      taskRef:
-        name: buildah
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
-      params:
-      - name: REGISTRY_URL
-        value: "$(params.REGISTRY_URL)"
-      - name: BUILD_IMAGE
-        value: "$(params.BUILD_IMAGE)"
-      - name: OCP_PROJECT
-        value: "$(params.OCP_PROJECT)"
-    - name: deploy-app
-      runAfter:
-      - build-image
-      taskRef:
-        name: deploy-app
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
-      params:
-      - name: BUILD_IMAGE
-        value: "$(params.BUILD_IMAGE)"
-      - name: OCP_PROJECT
-        value: "$(params.OCP_PROJECT)"
-EOF
-~~~
-
 ### 7. Set permission for tasks execution
 
 ~~~sh
@@ -262,6 +181,11 @@ oc adm policy add-role-to-user system:image-builder system:serviceaccount:devops
 oc adm policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
 ~~~
 
+### 8. Create the pipeline
+
+~~~sh
+$ curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/pipeline.yaml | oc apply -f -
+~~~
 
 ### 8. Start the pipeline
 
@@ -270,7 +194,7 @@ cat << EOF > | oc apply -f -
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  generateName: springapp-deploy-run-
+  name: springapp-deploy-run-01
   labels:
     tekton.dev/pipeline: pipeline-ci
 spec:
@@ -281,6 +205,8 @@ spec:
   pipelineRef:
     name: pipeline-ci
   params:
+    - name: "ARTIFACT_VERSION"
+      value: ""
     - name: "REPOSITORY_URL"
       value: "https://github.com/GMH501/spring-petclinic.git"
     - name: REGISTRY_URL
