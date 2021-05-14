@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: greet-someone-00
+spec:
+  taskRef:
+    name: greet-someone
+  params:
+  - name: WHO
+    value: World!

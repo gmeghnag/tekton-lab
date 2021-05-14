@@ -1,0 +1,25 @@
+kind: Pipeline
+apiVersion: tekton.dev/v1alpha1
+metadata:
+  name: greetings
+spec:
+  params:
+    - name: FIRST_GREETING
+      type: string
+    - name: SECOND_GREETING
+      type: string
+  tasks:
+    - name: first-greeting
+      params:
+        - name: WHO
+          value: $(params.FIRST_GREETING)
+      taskRef:
+        name: greet-someone
+    - name: second-greeting
+      runAfter:
+        - first-greeting
+      params:
+        - name: WHO
+          value: $(params.SECOND_GREETING)
+      taskRef:
+        name: greet-someone

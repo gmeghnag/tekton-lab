@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: greet-someone
+spec:
+  params:
+  - name: WHO
+    type: string
+    description: Variable used in the *greetings* step.
+    default: Tekton
+  steps:
+  - name: greetings
+    image: registry.access.redhat.com/ubi8/ubi:latest
+    script: |
+      echo "Hello $(params.WHO)"
