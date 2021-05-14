@@ -1,0 +1,19 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: greetings-tt
+spec:
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: greetings-
+    spec:
+      serviceAccountName: pipeline
+      pipelineRef:
+        name: greetings
+      params:
+        - name: FIRST_GREETING
+          value: ""
+        - name: SECOND_GREETING
+          value: ""

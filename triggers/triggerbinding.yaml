@@ -1,0 +1,10 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: greetings-tb
+spec:
+  params:
+  - name: FIRST_GREETING
+    value: $(body.FIRST_GREETING)
+  - name: SECOND_GREETING
+    value: $(body.SECOND_GREETING)

@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: greetings-el
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - ref: greetings-tb
+    template:
+      name: greetings-tt
