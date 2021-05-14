@@ -3,6 +3,9 @@ kind: TriggerTemplate
 metadata:
   name: greetings-tt
 spec:
+  params:
+  - name: FIRST_GREETING
+  - name: SECOND_GREETING
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -14,6 +17,6 @@ spec:
         name: greetings
       params:
         - name: FIRST_GREETING
-          value: ""
+          value: $(tt.params.FIRST_GREETING)
         - name: SECOND_GREETING
-          value: ""
+          value: $(tt.params.SECOND_GREETING)

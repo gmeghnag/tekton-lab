@@ -1,5 +1,5 @@
-kind: Pipeline
 apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
 metadata:
   name: greetings
 spec:
@@ -10,16 +10,16 @@ spec:
       type: string
   tasks:
     - name: first-greeting
+      taskRef:
+        name: greet-someone
       params:
         - name: WHO
           value: $(params.FIRST_GREETING)
+    - name: second-greeting
       taskRef:
         name: greet-someone
-    - name: second-greeting
       runAfter:
         - first-greeting
       params:
         - name: WHO
           value: $(params.SECOND_GREETING)
-      taskRef:
-        name: greet-someone
