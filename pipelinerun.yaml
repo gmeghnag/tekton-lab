@@ -3,14 +3,14 @@ kind: PipelineRun
 metadata:
   name: springapp-deploy-run-01
   labels:
-    tekton.dev/pipeline: pipeline-ci
+    tekton.dev/pipeline: pipeline-demo
 spec:
   serviceAccountName: pipeline
   serviceAccountNames:
     - taskName: build-image
       serviceAccountName: build-bot
   pipelineRef:
-    name: pipeline-ci
+    name: pipeline-demo
   params:
     - name: "ARTIFACT_VERSION"
       value: ""
@@ -27,4 +27,4 @@ spec:
   workspaces:
   - name: TKN_VOLUME
     persistentVolumeClaim:
-      claimName: pvc-pipeline-ci
+      claimName: pvc-pipeline-demo

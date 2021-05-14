@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" --data @body.json  http://prinquest-devops.apps.cluster-a375.a375.sandbox1266.opentlc.com/

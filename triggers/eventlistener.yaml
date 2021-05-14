@@ -1,0 +1,17 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: build-and-deploy
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - ref: build-and-deploy
+    template:
+      name: build-and-deploy
+    interceptors:
+    - cel:
+        filter: "header.match('X-GitHub-Event', 'push')"
+        overlays:
+            - key: extensions.truncated_sha
+              expression: "body.head_commit.id.truncate(7)"

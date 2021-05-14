@@ -27,7 +27,8 @@ spec:
     workingDir: $(workspaces.VOLUME.path)
     script: |
       # GET THE VERSION OF THE SOFTWARE FROM pom.xml FILE
-      version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed 's#<version>##g' | sed 's#</version>##g' | xargs)
+      version=$(cat pom.xml  | grep '<version>' | head -1 | egrep  '[1-9|.]+'  | sed \
+      's#<version>##g' | sed 's#</version>##g' | xargs)
 
       # GET THE HASH FOR THE HEAD COMMIT
       hash=$(git rev-parse HEAD | cut -c1-7)
@@ -37,4 +38,4 @@ spec:
 
       #echo ${version}-${hash} >> version.txt 
       # SAVE THE VERSION AND THE HASH IN A RESULT VARIABLE
-      echo ${version}-${hash}| tee $(results.ARTIFACT_VERSION.path)
+      echo ${version}-${hash} > $(results.ARTIFACT_VERSION.path)

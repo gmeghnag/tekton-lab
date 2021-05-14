@@ -178,7 +178,7 @@ task.tekton.dev/deploy-app created
 ~~~sh
 oc adm policy add-scc-to-user privileged -z build-bot -n devops
 oc adm policy add-role-to-user system:image-builder system:serviceaccount:devops:pipeline -n project-target-test
-oc adm policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
+oc adm policy add-role-to-user edit  system:serviceaccount:devops:build-bot -n project-target-test
 ~~~
 
 ### 8. Create the pipeline

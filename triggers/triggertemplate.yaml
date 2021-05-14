@@ -1,0 +1,34 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: build-and-deploy
+spec:
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: springapp-deploy-run-
+    spec:
+      serviceAccountName: pipeline
+      serviceAccountNames:
+        - taskName: build-image
+          serviceAccountName: build-bot
+      pipelineRef:
+        name: pipeline-demo
+      params:
+        - name: "ARTIFACT_VERSION"
+          value: ""
+        - name: "REPOSITORY_URL"
+          value: "https://github.com/GMH501/spring-petclinic.git"
+        - name: REGISTRY_URL
+          value: image-registry.openshift-image-registry.svc:5000
+        - name: "BUILD_IMAGE"
+          value: "spring-petclinic"
+        - name: "OCP_PROJECT"
+          value: "test-pipeline"
+        - name: "BRANCH_NAME"
+          value: "main"
+      workspaces:
+      - name: TKN_VOLUME
+        persistentVolumeClaim:
+          claimName: pvc-pipeline-demo

@@ -1,7 +1,7 @@
 kind: Pipeline
 apiVersion: tekton.dev/v1alpha1
 metadata:
-  name: pipeline-ci
+  name: pipeline-demo
 spec:
   params:
     - name: ARTIFACT_VERSION
@@ -64,16 +64,16 @@ spec:
       - name: OCP_PROJECT
         value: "$(params.OCP_PROJECT)"
     - name: deploy-app
+      workspaces:
+        - name: VOLUME
+          workspace: TKN_VOLUME
       runAfter:
       - build-image
       taskRef:
         name: deploy-app
-      workspaces:
-        - name: VOLUME
-          workspace: TKN_VOLUME
       params:
       - name: ARTIFACT_VERSION
-        value: $(tasks.clone-repository.results.ARTIFACT_VERSION)
+        value: "$(tasks.clone-repository.results.ARTIFACT_VERSION)"
       - name: BUILD_IMAGE
         value: "$(params.BUILD_IMAGE)"
       - name: OCP_PROJECT
