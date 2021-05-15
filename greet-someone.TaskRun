@@ -7,4 +7,4 @@ spec:
     name: greet-someone
   params:
   - name: WHO
-    value: World!
+    value: World

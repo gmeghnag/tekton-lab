@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "*.Task": "yaml",
+    "*.TaskRun": "yaml",
+    "*.Pipeline": "yaml",
+    "*.PipelineRun": "yaml",
+    "*.EventListener": "yaml",
+    "*.TriggerBinding": "yaml",
+    "*.TriggerTemplate": "yaml"
+  }
+}
