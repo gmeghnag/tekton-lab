@@ -13,5 +13,5 @@ spec:
     - cel:
         filter: "header.match('X-GitHub-Event', 'push')"
         overlays:
-            - key: extensions.truncated_sha
-              expression: "body.head_commit.id.truncate(7)"
+        - key: extensions.truncated_sha
+          expression: "body.head_commit.id.truncate(7)"

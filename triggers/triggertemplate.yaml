@@ -7,7 +7,7 @@ spec:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
     metadata:
-      generateName: springapp-deploy-run-
+      name: springapp-deploy-run-$(tt.extensions.gitsha)
     spec:
       serviceAccountName: pipeline
       serviceAccountNames:
