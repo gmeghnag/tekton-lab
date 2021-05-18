@@ -8,5 +8,5 @@ spec:
     value: $(body.repository.url)
   - name: git-repo-name
     value: $(body.repository.name)
-  - name: gitsha
+  - name: truncated_sha
     value: $(body.extensions.truncated_sha)

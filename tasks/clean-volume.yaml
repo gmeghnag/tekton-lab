@@ -7,7 +7,7 @@ spec:
   - name: VOLUME
   steps:
   - name: clean-volume
-    image: alpine
+    image: bash:latest
     workingDir: $(workspaces.VOLUME.path)
     script: |
       rm -rf $(workspaces.VOLUME.path)/*; rm -rf $(workspaces.VOLUME.path)/.[a-zA-Z_]*; pwd; ls -la $(workspaces.VOLUME.path);

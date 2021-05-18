@@ -36,7 +36,7 @@ $ oc new-project devops
 ## 4. Deploy nexus server
 
 ~~~sh
-oc process -f templates/nexus3.yaml -p SC_NAME=gp2 -p PVC_SIZE=10Gi | oc apply -f -
+curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/templates/nexus3.yaml | oc process -f - -p PVC_SIZE=10Gi -p SC_NAME=gp2 | oc apply -f -
 ~~~
 
 ### Create maven repository on nexus
@@ -89,6 +89,7 @@ task.tekton.dev/deploy-app created
 oc adm policy add-scc-to-user privileged -z build-bot -n devops
 oc adm policy add-role-to-user system:image-builder system:serviceaccount:devops:pipeline -n project-target-test
 oc adm policy add-role-to-user edit  system:serviceaccount:devops:build-bot -n project-target-test
+oc adm policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
 ~~~
 
 ### 8. Create the pipeline

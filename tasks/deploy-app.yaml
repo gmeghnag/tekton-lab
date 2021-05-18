@@ -19,4 +19,5 @@ spec:
     workingDir: $(workspaces.VOLUME.path)
     script: |
       oc project $(params.OCP_PROJECT) 
-      oc tag $(params.BUILD_IMAGE):${ARTIFACT_VERSION} $(params.BUILD_IMAGE):latest
+      echo $(params.ARTIFACT_VERSION)
+      oc tag $(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION) $(params.BUILD_IMAGE):latest

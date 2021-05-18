@@ -38,4 +38,4 @@ spec:
 
       #echo ${version}-${hash} >> version.txt 
       # SAVE THE VERSION AND THE HASH IN A RESULT VARIABLE
-      echo ${version}-${hash} > $(results.ARTIFACT_VERSION.path)
+      echo -n ${version}-${hash} | tee $(results.ARTIFACT_VERSION.path)

@@ -21,7 +21,7 @@ spec:
     - name: "BUILD_IMAGE"
       value: "spring-petclinic"
     - name: "OCP_PROJECT"
-      value: "test-pipeline"
+      value: "project-target-test"
     - name: "BRANCH_NAME"
       value: "main"
   workspaces:
