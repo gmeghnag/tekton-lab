@@ -11,7 +11,8 @@ spec:
       name: build-and-deploy
     interceptors:
     - cel:
-        filter: "header.match('X-GitHub-Event', 'push')"
+        filter: >-
+          (header.match('X-GitHub-Event', 'push') && body.ref == 'refs/heads/main')
         overlays:
         - key: extensions.truncated_sha
           expression: "body.head_commit.id.truncate(7)"

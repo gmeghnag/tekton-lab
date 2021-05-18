@@ -20,13 +20,13 @@ spec:
   steps:
 
   - name: git-clone
-    image: alpine/git:latest
+    image: image-registry.openshift-image-registry.svc:5000/devops/git
     script: |
       git clone -b $(params.BRANCH_NAME) "$(params.REPOSITORY_URL)" $(workspaces.VOLUME.path)
       cd  $(workspaces.VOLUME.path) && git checkout $(params.COMMIT_ID)
 
   - name: store-artifact-version
-    image: alpine/git:latest
+    image: image-registry.openshift-image-registry.svc:5000/devops/git
     workingDir: $(workspaces.VOLUME.path)
     script: |
       # GET THE VERSION OF THE SOFTWARE FROM pom.xml FILE

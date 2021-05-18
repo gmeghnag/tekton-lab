@@ -31,6 +31,8 @@ spec:
           value: "project-target-test"
         - name: "BRANCH_NAME"
           value: "main"
+        - name: "COMMIT_ID"
+          value: "$(tt.params.truncated_sha)"
       workspaces:
       - name: TKN_VOLUME
         persistentVolumeClaim:

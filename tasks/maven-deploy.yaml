@@ -7,7 +7,7 @@ spec:
   - name: VOLUME
   steps:
     - name: maven-deploy
-      image: maven
+      image: image-registry.openshift-image-registry.svc:5000/devops/maven
       script: |
         cd  $(workspaces.VOLUME.path)
         ls -la
