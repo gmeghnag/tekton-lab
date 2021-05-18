@@ -18,6 +18,6 @@ spec:
     image: quay.io/openshift/origin-cli:latest 
     workingDir: $(workspaces.VOLUME.path)
     script: |
-      oc project $(params.OCP_PROJECT) 
-      echo $(params.ARTIFACT_VERSION)
+      oc project $(params.OCP_PROJECT)
       oc tag $(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION) $(params.BUILD_IMAGE):latest
+      oc get dc $(params.BUILD_IMAGE) || (oc new-app $(params.BUILD_IMAGE) && oc expose service/$(params.BUILD_IMAGE))

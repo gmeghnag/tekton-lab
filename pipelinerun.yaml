@@ -24,6 +24,8 @@ spec:
       value: "project-target-test"
     - name: "BRANCH_NAME"
       value: "main"
+    - name: "COMMIT_ID"
+      value: "HEAD"
   workspaces:
   - name: TKN_VOLUME
     persistentVolumeClaim:

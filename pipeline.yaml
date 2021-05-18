@@ -4,6 +4,8 @@ metadata:
   name: pipeline-demo
 spec:
   params:
+    - name: COMMIT_ID
+      type: string
     - name: ARTIFACT_VERSION
       type: string
     - name: REPOSITORY_URL
@@ -29,6 +31,8 @@ spec:
       runAfter:
         - clean-volume
       params:
+        - name: COMMIT_ID
+          value: "$(params.COMMIT_ID)"
         - name: REPOSITORY_URL
           value: "$(params.REPOSITORY_URL)"
         - name: BRANCH_NAME
