@@ -41,14 +41,14 @@ $ oc create -f greet-someone.Task
 $ oc create -f greetings.Pipeline
 ~~~
 
-## 5. Try to start the task using tkn CLI
+## 5. Start the task using tkn CLI
 
 ~~~sh
 tkn task start greet-someone -p WHO=Redhat --showlog
 tkn pipeline start greetings -p FIRST_GREETING=REDHATTERS -p SECOND_GREETING=WORLD --showlog
 ~~~
 
-## 6. Try to start the pipeline using tkn CLI
+## 6. Start the pipeline using tkn CLI
 
 ~~~sh
 tkn pipeline start greetings -p FIRST_GREETING=REDHATTERS -p SECOND_GREETING=WORLD --showlog
@@ -61,13 +61,13 @@ $ cd tekton-lab
 $ oc create -k triggers
 ~~~
 
-## 7. expose the EventListener service:
+## 8. Expose the EventListener service:
 
 ~~~sh
 oc expose svc/el-greetings-el
 ~~~
 
-## 6. Try to start the Pipeline triggering an Event:
+## 9. Start the Pipeline triggering an Event:
 
 ~~~sh
 $ cd tekton-lab/test
