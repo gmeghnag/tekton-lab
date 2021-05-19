@@ -94,9 +94,10 @@ triggertemplate.triggers.tekton.dev/pipeline-demo-tt created
  - #### triggertemplate.triggers.tekton.dev/pipeline-demo-tt
  - #### pipeline.tekton.dev/pipeline-demo
 
-### 7. Set permission for tasks execution
+### 7. Create build-bot ServiceAccount and set permission for tasks execution
 
 ~~~sh
+oc create sa build-bot -n devops
 oc adm policy add-scc-to-user privileged -z build-bot -n devops
 oc adm policy add-role-to-user system:image-builder system:serviceaccount:devops:pipeline -n project-target-test
 oc adm policy add-role-to-user edit  system:serviceaccount:devops:build-bot -n project-target-test
