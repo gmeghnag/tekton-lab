@@ -7,3 +7,7 @@ resources:
 - tasks/maven-deploy.yaml
 - tasks/build-image.yaml
 - tasks/deploy-app.yaml
+- pipeline.yaml
+- triggers/eventlistener.yaml
+- triggers/triggerbinding.yaml
+- triggers/triggertemplate.yaml

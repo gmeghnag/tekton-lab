@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineRun
 metadata:
-  name: springapp-deploy-run-01
+  name: pipeline-demo-run-01
   labels:
     tekton.dev/pipeline: pipeline-demo
 spec:

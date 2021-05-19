@@ -1,14 +1,14 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: build-and-deploy
+  name: pipeline-demo-el
 spec:
   serviceAccountName: pipeline
   triggers:
   - bindings:
-    - ref: build-and-deploy
+    - ref: pipeline-demo-tb
     template:
-      name: build-and-deploy
+      name: pipeline-demo-tt
     interceptors:
     - cel:
         filter: >-

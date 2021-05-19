@@ -1,11 +1,13 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: build-and-deploy
+  name: pipeline-demo-tt
 spec:
   params:
   - name: truncated_sha
-    description: truncated_sha
+  - name: git_repo_url
+  - name: git_repo_name
+
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -22,11 +24,11 @@ spec:
         - name: "ARTIFACT_VERSION"
           value: ""
         - name: "REPOSITORY_URL"
-          value: "https://github.com/GMH501/spring-petclinic.git"
+          value: "$(tt.params.git_repo_url).git"
         - name: REGISTRY_URL
           value: image-registry.openshift-image-registry.svc:5000
         - name: "BUILD_IMAGE"
-          value: "spring-petclinic"
+          value: "$(tt.params.git_repo_name)"
         - name: "OCP_PROJECT"
           value: "project-target-test"
         - name: "BRANCH_NAME"

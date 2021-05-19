@@ -1,12 +1,12 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
-  name: build-and-deploy
+  name: pipeline-demo-tb
 spec:
   params:
-  - name: git-repo-url
+  - name: git_repo_url
     value: $(body.repository.url)
-  - name: git-repo-name
+  - name: git_repo_name
     value: $(body.repository.name)
   - name: truncated_sha
     value: $(body.extensions.truncated_sha)
