@@ -27,10 +27,13 @@ $ tar xf tkn-linux-amd64-0.17.2.tar.gz
 $ tkn version
 ~~~
 
-## 3. Create new project in which deploy the resources used by our pipeline workflow (Nexus repository, pvc (used by Tekton Pipeline), Tekton Tasks, Pipeline, Pipelinurun):
+## 3. Create new projects: 
+- the first one in which deploy the resources used by our pipeline workflow: Nexus repository, pvc (used by Tekton Pipeline), Tekton Tasks, Pipeline, Pipelinurun
+- the second one used by our pipeline to build and release our software
 
 ~~~sh
 $ oc new-project devops
+$ oc new-project project-target-test
 ~~~
 
 ## 4. Deploy nexus server
@@ -49,26 +52,30 @@ cat << EOF | oc apply -f -
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  pvc-pipeline-ci
+  name:  pvc-pipeline-demo
 spec:
   resources:
     requests:
-      storage: 10Gi
+      storage: 4Gi
   accessModes:
     - ReadWriteOnce
 
 EOF
 ~~~
 
-## 6. Create tasks resources in the namespace:
+## 6. Create Tekton resources in the devops namespace:
 ~~~sh
-$ oc apply -k https://github.com/gmeghnag/tekton-lab -n devops
+$ oc create -k https://github.com/gmeghnag/tekton-lab -n devops
 
-task.tekton.dev/clean-volume created
-task.tekton.dev/clone-repository created
+pipeline.tekton.dev/pipeline-demo created
+task.tekton.dev/deploy-app created
 task.tekton.dev/maven-deploy created
 task.tekton.dev/buildah created
-task.tekton.dev/deploy-app created
+task.tekton.dev/clean-volume created
+task.tekton.dev/clone-repository created
+eventlistener.triggers.tekton.dev/pipeline-demo-el created
+triggerbinding.triggers.tekton.dev/pipeline-demo-tb created
+triggertemplate.triggers.tekton.dev/pipeline-demo-tt created
 ~~~
 
 ### This will create the following Task Resources: 
@@ -82,6 +89,10 @@ task.tekton.dev/deploy-app created
    - **Task that use Buildah to build and push the container image to the OCP_PROJECT from which it will be possible to consume it**
  - #### task.tekton.dev/deploy-app
    - **Task that use `oc` cli to tag the previously push image as latest on the target-project**
+ - #### eventlistener.triggers.tekton.dev/pipeline-demo-el
+ - #### triggerbinding.triggers.tekton.dev/pipeline-demo-tb
+ - #### triggertemplate.triggers.tekton.dev/pipeline-demo-tt
+ - #### pipeline.tekton.dev/pipeline-demo
 
 ### 7. Set permission for tasks execution
 
@@ -92,46 +103,7 @@ oc adm policy add-role-to-user edit  system:serviceaccount:devops:build-bot -n p
 oc adm policy add-role-to-user edit  system:serviceaccount:devops:pipeline -n project-target-test
 ~~~
 
-### 8. Create the pipeline
-
-~~~sh
-$ curl -s https://raw.githubusercontent.com/gmeghnag/tekton-lab/main/pipeline.yaml | oc apply -f -
-~~~
-
-### 8. Start the pipeline
-
-~~~sh
-cat << EOF > | oc apply -f -
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineRun
-metadata:
-  name: springapp-deploy-run-01
-  labels:
-    tekton.dev/pipeline: pipeline-ci
-spec:
-  serviceAccountName: pipeline
-  serviceAccountNames:
-    - taskName: build-image
-      serviceAccountName: build-bot
-  pipelineRef:
-    name: pipeline-ci
-  params:
-    - name: "ARTIFACT_VERSION"
-      value: ""
-    - name: "REPOSITORY_URL"
-      value: "https://github.com/GMH501/spring-petclinic.git"
-    - name: REGISTRY_URL
-      value: image-registry.openshift-image-registry.svc:5000
-    - name: "BUILD_IMAGE"
-      value: "spring-petclinic"
-    - name: "OCP_PROJECT"
-      value: "project-target-test"
-    - name: "BRANCH_NAME"
-      value: "main"
-  workspaces:
-  - name: TKN_VOLUME
-    persistentVolumeClaim:
-      claimName: pvc-pipeline-ci
-EOF
-~~~
-
+### 8. Now you can start the pipeline:
+- **manually using `tkn`**
+- **manually creating a pipelinerun resource**
+- **automatically triggering new pipelinerun at every push to your codebase (You must to configure your git repository before doing it)**
