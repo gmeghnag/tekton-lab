@@ -10,4 +10,4 @@ spec:
     - name: FIRST_GREETING
       value: TEKTON
     - name: SECOND_GREETING
-      value: TEKTON
+      value: REDHAT

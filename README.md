@@ -33,19 +33,45 @@ $ tkn version
 $ oc new-project devops
 ~~~
 
-## 4. 
+## 4. Create Task and Pipeline resources in the namespace:
+~~~sh
+$ git clone https://github.com/gmeghnag/tekton-lab.git
+$ cd tekton-lab
+$ oc create -f greet-someone.Task
+$ oc create -f greetings.Pipeline
+~~~
+
+## 5. Try to start the task using tkn CLI
+
+~~~sh
+tkn task start greet-someone -p WHO=Redhat --showlog
+tkn pipeline start greetings -p FIRST_GREETING=REDHATTERS -p SECOND_GREETING=WORLD --showlog
+~~~
+
+## 6. Try to start the pipeline using tkn CLI
 
 ~~~sh
 tkn pipeline start greetings -p FIRST_GREETING=REDHATTERS -p SECOND_GREETING=WORLD --showlog
 ~~~
 
-## 5. Create tasks resources in the namespace:
-~~~sh
-$ oc apply -k https://github.com/gmeghnag/tekton-lab -n devops
+## 7. Create EventListener, TriggerBinding and TriggerTemplate resources in the namespace:
 
-task.tekton.dev/clean-volume created
-task.tekton.dev/clone-repository created
-task.tekton.dev/maven-deploy created
-task.tekton.dev/buildah created
-task.tekton.dev/deploy-app created
+~~~sh
+$ cd tekton-lab
+$ oc create -k triggers
+~~~
+
+## 7. expose the EventListener service:
+
+~~~sh
+oc expose svc/el-greetings-el
+~~~
+
+## 6. Try to start the Pipeline triggering an Event:
+
+~~~sh
+$ cd tekton-lab/test
+$ curl -X POST -H "Content-Type: application/json" --data @body.json  http://el-greetings-el-devops.apps.cluster-5c71.5c71.sandbox1496.opentlc.com
+
+$ tkn pr logs
 ~~~
