@@ -8,8 +8,6 @@ spec:
   steps:
     - name: maven-deploy
       image: image-registry.openshift-image-registry.svc:5000/devops/maven
+      workingDir: $(workspaces.VOLUME.path)
       script: |
-        cd  $(workspaces.VOLUME.path)
-        ls -la
-        sed -i 's#admin123#admin123#g' $(workspaces.VOLUME.path)/settings.xml
         mvn deploy -Dmaven.test.skip=true -s settings.xml 
