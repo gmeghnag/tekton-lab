@@ -7,7 +7,7 @@ spec:
   - name: VOLUME
   steps:
     - name: maven-deploy
-      image: image-registry.openshift-image-registry.svc:5000/devops/maven
+      image: docker.io/maven
       workingDir: $(workspaces.VOLUME.path)
       script: |
         mvn deploy -Dmaven.test.skip=true -s settings.xml 
