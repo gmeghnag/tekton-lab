@@ -35,7 +35,7 @@ $ oc new-project devops
 
 ## 4. Create Task and Pipeline resources in the namespace:
 ~~~sh
-$ git clone https://github.com/gmeghnag/tekton-lab.git
+$ git clone https://github.com/gmeghnag/tekton-lab.git -b hello-tekton
 $ cd tekton-lab
 $ oc create -f greet-someone.Task
 $ oc create -f greetings.Pipeline
