@@ -1,4 +1,4 @@
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: greetings-el
@@ -8,4 +8,4 @@ spec:
   - bindings:
     - ref: greetings-tb
     template:
-      name: greetings-tt
+      ref: greetings-tt
