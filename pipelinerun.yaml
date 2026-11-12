@@ -1,13 +1,14 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: pipeline-demo-run-01
+  name: pipeline-demo-run-04
   labels:
     tekton.dev/pipeline: pipeline-demo
 spec:
-  serviceAccountName: pipeline
-  serviceAccountNames:
-    - taskName: build-image
+  taskRunTemplate:
+    serviceAccountName: pipeline
+  taskRunSpecs:
+    - pipelineTaskName: build-image
       serviceAccountName: build-bot
   pipelineRef:
     name: pipeline-demo
@@ -15,7 +16,7 @@ spec:
     - name: "ARTIFACT_VERSION"
       value: ""
     - name: "REPOSITORY_URL"
-      value: "https://github.com/GMH501/spring-petclinic.git"
+      value: "https://github.com/gmeghnag/spring-petclinic.git"
     - name: REGISTRY_URL
       value: image-registry.openshift-image-registry.svc:5000
     - name: "BUILD_IMAGE"

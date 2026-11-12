@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: deploy-app
@@ -15,9 +15,14 @@ spec:
     description: Progetto OpenShift su cui deployare l'applicazione.
   steps:
   - name: patch
-    image: quay.io/openshift/origin-cli:latest 
+    image: quay.io/openshift/origin-cli:4.21
     workingDir: $(workspaces.VOLUME.path)
     script: |
       oc project $(params.OCP_PROJECT)
+      # OCP 4.x: deploy diretto dall'immagine nel registry.
+      # new-app <project>/<image>:<tag> crea (o aggiorna) ImageStream + Deployment + Service.
+      oc new-app $(params.OCP_PROJECT)/$(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION) --name $(params.BUILD_IMAGE)
+      # Mantieni un tag "latest" sull'ImageStream (comportamento originale del task).
       oc tag $(params.BUILD_IMAGE):$(params.ARTIFACT_VERSION) $(params.BUILD_IMAGE):latest
-      oc get deployment $(params.BUILD_IMAGE) || (oc new-app $(params.BUILD_IMAGE) && oc expose service/$(params.BUILD_IMAGE))
+      # Espone il service con una route (no-op se la route esiste già).
+      oc get route $(params.BUILD_IMAGE) >/dev/null 2>&1 || oc expose service/$(params.BUILD_IMAGE)

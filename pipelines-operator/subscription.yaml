@@ -4,7 +4,9 @@ metadata:
   name: openshift-pipelines-operator
   namespace: openshift-operators
 spec:
-  channel:  stable
+  # Channel pinning the 1.23 line (catalog has no "stable"; it exposes latest + pipelines-1.X).
+  # pipelines-1.23 -> openshift-pipelines-operator-rh.v1.23.x (Tekton Pipelines 1.12, Triggers 0.36).
+  channel:  pipelines-1.23
   name: openshift-pipelines-operator-rh 
   source: redhat-operators 
   sourceNamespace: openshift-marketplace

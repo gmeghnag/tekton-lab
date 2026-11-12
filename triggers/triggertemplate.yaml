@@ -1,4 +1,4 @@
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: pipeline-demo-tt
@@ -9,15 +9,16 @@ spec:
   - name: git_repo_name
 
   resourcetemplates:
-  - apiVersion: tekton.dev/v1alpha1
+  - apiVersion: tekton.dev/v1
     kind: PipelineRun
     metadata:
       name: springapp-deploy-run-$(tt.params.truncated_sha)
     spec:
-      serviceAccountName: pipeline
-      serviceAccountNames:
-        - taskName: build-image
-          serviceAccountName: build-bot
+      taskRunTemplate:
+        serviceAccountName: pipeline
+      taskRunSpecs:
+      - pipelineTaskName: build-image
+        serviceAccountName: build-bot
       pipelineRef:
         name: pipeline-demo
       params:

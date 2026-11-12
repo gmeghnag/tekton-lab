@@ -1,5 +1,5 @@
 kind: Pipeline
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1
 metadata:
   name: pipeline-demo
 spec:
@@ -60,7 +60,7 @@ spec:
           workspace: TKN_VOLUME
       params:
       - name: ARTIFACT_VERSION
-        value: $(tasks.clone-repository.results.ARTIFACT_VERSION)
+        value: "$(tasks.clone-repository.results.ARTIFACT_VERSION)"
       - name: REGISTRY_URL
         value: "$(params.REGISTRY_URL)"
       - name: BUILD_IMAGE

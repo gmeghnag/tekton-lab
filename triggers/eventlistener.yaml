@@ -1,18 +1,22 @@
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: pipeline-demo-el
 spec:
   serviceAccountName: pipeline
   triggers:
-  - bindings:
-    - ref: pipeline-demo-tb
-    template:
-      name: pipeline-demo-tt
+  - name: pipeline-demo-trigger
     interceptors:
-    - cel:
-        filter: >-
-          (header.match('X-GitHub-Event', 'push') && body.ref == 'refs/heads/main')
-        overlays:
+    - ref:
+        name: cel
+      params:
+      - name: filter
+        value: (header.match('X-GitHub-Event', 'push') && body.ref == 'refs/heads/main')
+      - name: overlays
+        value:
         - key: extensions.truncated_sha
           expression: "body.head_commit.id.truncate(7)"
+    bindings:
+    - ref: pipeline-demo-tb
+    template:
+      ref: pipeline-demo-tt
